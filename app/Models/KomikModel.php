@@ -8,6 +8,7 @@ class KomikModel extends Model
 {
     protected $table = 'komik';
     protected $primaryKey = 'id';
+    protected $allowedFields = ['judul', 'slug', 'penulis', 'penerbit', 'sampul', 'created_at', 'updated_at'];
 
     public function getKomik($slug = false){
       if($slug == false){

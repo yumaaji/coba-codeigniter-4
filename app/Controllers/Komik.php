@@ -31,4 +31,54 @@ class Komik extends BaseController
 
       return view('komik/detail', $data);
     }
+
+    public function create() {
+      $data = [
+        'title' => 'Form Tambah Data',
+        'validation' => session()->getFlashdata('validation')
+      ];
+
+      return view('komik/create', $data);
+    }
+
+    public function store() {
+      if (!$this->validate([
+        'judul' => ['required', 'is_unique[komik.judul]'],
+        'penulis' => 'required',
+        'penerbit' => 'required',
+        'sampul' => 'required'
+
+      ],[
+        'judul' => [
+          'required' => 'Judul harus diisi',
+          'is_unique' => 'Judul sudah terdaftar',
+        ],
+        'penulis' => [
+          'required' => 'Penulis harus diisi',
+        ],
+        'penerbit' => [
+          'required' => 'Penerbit harus diisi',
+        ],
+        'sampul' => [
+          'required' => 'Sampul harus diisi',
+        ],
+      ])){
+        $validation = \Config\Services::validation();
+
+        return redirect()->to('/komik/create')->withInput()->with('validation', $validation);
+      }
+
+      $slug = url_title($this->request->getVar('judul'), '-', true);
+      $this->komikModel->save([
+        'judul' => $this->request->getVar('judul'),
+        'slug' => $slug,
+        'penulis' => $this->request->getVar('penulis'),
+        'penerbit' => $this->request->getVar('penerbit'),
+        'sampul' => $this->request->getVar('sampul'),
+      ]);
+
+      session()->setFlashdata('success', 'Data berhasil ditambahkan');
+      return $this->response->redirect('/komik');
+    }
+    
 }
